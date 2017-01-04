@@ -99,7 +99,7 @@
     "phantomjs-prebuilt": "^2.1.7",
     "rimraf": "^2.5.3",
     "rollup": "^0.38.0",
-    "rollup-plugin-babel": "^1.0.0",
+    "rollup-plugin-babel": "^2.6.1",
     "rollup-plugin-memory": "^2.0.0",
     "rollup-plugin-node-resolve": "^2.0.0",
     "sinon": "^1.17.4",
