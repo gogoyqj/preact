@@ -8,6 +8,8 @@ import { toLowerCase, isString, isFunction, hashToClassName } from '../util';
 /** Removes a given DOM Node from its parent. */
 export function removeNode(node) {
 	let p = node.parentNode;
+	var key = global.internalInstanceKey
+	if (node[key]) node[key] = node[key]._hostNode = node[key]._hostParent = null
 	if (p) p.removeChild(node);
 }
 
@@ -19,7 +21,7 @@ export function removeNode(node) {
  *	@param {any} old	The last value that was set for this name/node pair
  *	@param {any} value	An attribute value, such as a function to be used as an event handler
  *	@param {Boolean} isSvg	Are we currently diffing inside an svg?
- *  @param {Object} inst React ComponentInstance
+ *	@param {Object} inst VNode instance
  *	@private
  */
 export function setAccessor(node, name, old, value, isSvg, inst) {
