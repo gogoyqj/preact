@@ -19,9 +19,10 @@ export function removeNode(node) {
  *	@param {any} old	The last value that was set for this name/node pair
  *	@param {any} value	An attribute value, such as a function to be used as an event handler
  *	@param {Boolean} isSvg	Are we currently diffing inside an svg?
+ *  @param {Object} inst React ComponentInstance
  *	@private
  */
-export function setAccessor(node, name, old, value, isSvg) {
+export function setAccessor(node, name, old, value, isSvg, inst) {
 
 	if (name==='className') name = 'class';
 
@@ -52,17 +53,22 @@ export function setAccessor(node, name, old, value, isSvg) {
 		if (value) node.innerHTML = value.__html || '';
 	}
 	else if (name[0]=='o' && name[1]=='n') {
-		let l = node._listeners || (node._listeners = {});
-		name = toLowerCase(name.substring(2));
-		// @TODO: this might be worth it later, un-breaks focus/blur bubbling in IE9:
-		// if (node.attachEvent) name = name=='focus'?'focusin':name=='blur'?'focusout':name;
-		if (value) {
-			if (!l[name]) node.addEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
-		}
-		else if (l[name]) {
-			node.removeEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
-		}
-		l[name] = value;
+		// fork add to 
+		if (window.qreact_event) {
+			qreact_event(node, name, value, inst)
+        } else {
+			let l = node._listeners || (node._listeners = {});
+			name = toLowerCase(name.substring(2));
+			// @TODO: this might be worth it later, un-breaks focus/blur bubbling in IE9:
+			// if (node.attachEvent) name = name=='focus'?'focusin':name=='blur'?'focusout':name;
+			if (value) {
+				if (!l[name]) node.addEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
+			}
+			else if (l[name]) {
+				node.removeEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
+			}
+			l[name] = value;
+        }
 	}
 	else if (name!=='list' && name!=='type' && !isSvg && name in node) {
 		setProperty(node, name, value==null ? '' : value);

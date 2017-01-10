@@ -161,7 +161,7 @@ function idiff(dom, vnode, context, mountAll) {
 
 
 	// Apply attributes/props from VNode to the DOM Element:
-	diffAttributes(out, vnode.attributes, props);
+	diffAttributes(out, vnode.attributes, props, vnode);
 
 
 	// invoke original ref (from before resolving Pure Functional Components):
@@ -305,12 +305,12 @@ export function recollectNodeTree(node, unmountOnly) {
  *	@param {Object} attrs		The desired end-state key-value attribute pairs
  *	@param {Object} old			Current/previous attributes (from previous VNode or element's prop cache)
  */
-function diffAttributes(dom, attrs, old) {
+function diffAttributes(dom, attrs, old, inst) {
 	// remove attributes no longer present on the vnode by setting them to undefined
 	let name;
 	for (name in old) {
 		if (!(attrs && name in attrs) && old[name]!=null) {
-			setAccessor(dom, name, old[name], old[name] = undefined, isSvgMode);
+			setAccessor(dom, name, old[name], old[name] = undefined, isSvgMode, inst);
 		}
 	}
 
@@ -318,7 +318,7 @@ function diffAttributes(dom, attrs, old) {
 	if (attrs) {
 		for (name in attrs) {
 			if (name!=='children' && name!=='innerHTML' && (!(name in old) || attrs[name]!==(name==='value' || name==='checked' ? dom[name] : old[name]))) {
-				setAccessor(dom, name, old[name], old[name] = attrs[name], isSvgMode);
+				setAccessor(dom, name, old[name], old[name] = attrs[name], isSvgMode, inst);
 			}
 		}
 	}

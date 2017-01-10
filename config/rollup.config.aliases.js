@@ -7,6 +7,7 @@ export default Object.assign({}, rollupConfig, {
 			path: 'src/preact',
 			contents: `import { h } from './preact';export * from './preact';export { h as createElement };`
 		}),
-		...rollupConfig.plugins.slice(1)
+		// ...rollupConfig.plugins.slice(1)
+        Object.assign({}, rollupConfig.plugins.slice(1))
 	]
 });
