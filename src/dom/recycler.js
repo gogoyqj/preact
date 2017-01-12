@@ -9,6 +9,10 @@ export function collectNode(node) {
 	removeNode(node);
 
 	if (node instanceof Element) {
+		// reset node properties
+        node.style.cssText = ''
+        node.className = ''
+
 		node._component = node._componentConstructor = null;
 
 		let name = node.normalizedNodeName || toLowerCase(node.nodeName);
