@@ -2,6 +2,28 @@
  *	@returns obj
  *	@private
  */
+
+
+function getInternalInstanceKey() {
+	if (typeof internalInstanceKey !== 'undefined') {
+		return internalInstanceKey
+	}
+}
+
+export function loseup(inst, node) {
+	var key = getInternalInstanceKey()
+  	if (key) {
+	  	qreact_event.precacheNode(inst, node)
+  	}
+}
+
+export function garbage(node) {
+	var key = getInternalInstanceKey()
+	if (node[key]) {
+		node[key] = node[key]._hostNode = node[key]._hostParent = null
+	}
+}
+
 export function extend(obj, props) {
 	if (props) {
 		for (let i in props) obj[i] = props[i];

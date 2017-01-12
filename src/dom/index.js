@@ -1,6 +1,6 @@
 import { NON_DIMENSION_PROPS, NON_BUBBLING_EVENTS } from '../constants';
 import options from '../options';
-import { toLowerCase, isString, isFunction, hashToClassName } from '../util';
+import { toLowerCase, isString, isFunction, hashToClassName, garbage } from '../util';
 
 
 
@@ -8,8 +8,7 @@ import { toLowerCase, isString, isFunction, hashToClassName } from '../util';
 /** Removes a given DOM Node from its parent. */
 export function removeNode(node) {
 	let p = node.parentNode;
-	var key = preact.internalInstanceKey
-	if (node[key]) node[key] = node[key]._hostNode = node[key]._hostParent = null
+	garbage(node)
 	if (p) p.removeChild(node);
 }
 
@@ -56,7 +55,7 @@ export function setAccessor(node, name, old, value, isSvg, inst) {
 	}
 	else if (name[0]=='o' && name[1]=='n') {
 		// fork add to 
-		if (window.qreact_event) {
+		if (typeof qreact_event !== 'undefined') {
 			qreact_event(node, name, value, inst)
         } else {
 			let l = node._listeners || (node._listeners = {});

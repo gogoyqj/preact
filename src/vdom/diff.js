@@ -1,5 +1,5 @@
 import { ATTR_KEY } from '../constants';
-import { isString, isFunction } from '../util';
+import { isString, isFunction, garbage, loseup } from '../util';
 import { isSameNodeType, isNamedNode } from './index';
 import { isFunctionalComponent, buildFunctionalComponent } from './functional-component';
 import { buildComponentFromVNode } from './component';
@@ -51,7 +51,10 @@ export function diff(dom, vnode, context, mountAll, parent, componentRoot) {
 	let ret = idiff(dom, vnode, context, mountAll);
 
 	// append the element if its a new parent
-	if (parent && ret.parentNode!==parent) parent.appendChild(ret);
+	if (parent && ret.parentNode!==parent) {
+		parent.appendChild(ret);
+		loseup(vnode, ret)
+	}
 
 	// diffLevel being reduced to 0 means we're exiting the diff
 	if (!--diffLevel) {
@@ -119,6 +122,7 @@ function idiff(dom, vnode, context, mountAll) {
 		// case: we had no element to begin with
 		// - create an element with the nodeName from VNode
 		out = createNode(nodeName, isSvgMode);
+		vnode && loseup(vnode, out)
 	}
 	else if (!isNamedNode(dom, nodeName)) {
 		// case: Element and VNode had different nodeNames
@@ -126,6 +130,7 @@ function idiff(dom, vnode, context, mountAll) {
 		// - then migrate children from old to new
 
 		out = createNode(nodeName, isSvgMode);
+		vnode && loseup(vnode, out)
 
 		// move children into the replacement node
 		while (dom.firstChild) out.appendChild(dom.firstChild);
@@ -277,6 +282,7 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
  */
 export function recollectNodeTree(node, unmountOnly) {
 	let component = node._component;
+	garbage(node)
 	if (component) {
 		// if node is owned by a Component, unmount that component (ends up recursing back here)
 		unmountComponent(component, !unmountOnly);
