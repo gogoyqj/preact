@@ -20,7 +20,7 @@ export function loseup(inst, node) {
 export function garbage(node) {
 	var key = getInternalInstanceKey()
 	if (node[key]) {
-		node[key] = node[key]._hostNode = node[key]._hostParent = null
+		qreact_event.garbage(node, key)
 	}
 }
 
