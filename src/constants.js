@@ -9,6 +9,8 @@ export const EMPTY = {};
 
 export const ATTR_KEY = typeof Symbol!=='undefined' ? Symbol.for('preactattr') : '__preactattr_';
 
+
+// qreact begin
 // 对照react补齐isUnitlessNumber的属性
 var not_dimension_props_without_profixes = {
 	animationIterationCount: 1,
@@ -63,9 +65,10 @@ Object.keys(not_dimension_props_without_profixes).forEach(function(prop) {
     })
 })
 
-
-// DOM properties that should NOT have "px" added when numeric
 export const NON_DIMENSION_PROPS = not_dimension_props_without_profixes;
+// qreact end
+
+
 
 // DOM event types that do not bubble and should be attached via useCapture
 export const NON_BUBBLING_EVENTS = { blur:1, error:1, focus:1, load:1, resize:1, scroll:1 };
