@@ -1,6 +1,9 @@
 import { SYNC_RENDER, NO_RENDER, FORCE_RENDER, ASYNC_RENDER, ATTR_KEY } from '../constants';
 import options from '../options';
-import { isFunction, clone, extend } from '../util';
+// qreact begin
+// import { isFunction, clone, extend } from '../util';
+import { isFunction, clone, extend, resetNode } from '../util';
+// qreact end
 import { enqueueRender } from '../render-queue';
 import { getNodeProps } from './index';
 import { diff, mounts, diffLevel, flushMounts, recollectNodeTree } from './diff';
@@ -257,6 +260,9 @@ export function unmountComponent(component, remove) {
 
 	if (component.componentWillUnmount) component.componentWillUnmount();
 
+	// qreact begin
+	resetNode(component.base)
+	// qreact end
 	component.base = null;
 
 	// recursively tear down & recollect high-order component children:

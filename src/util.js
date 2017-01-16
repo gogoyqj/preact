@@ -3,7 +3,7 @@
  *	@private
  */
 
-
+// qreact begin
 function getInternalInstanceKey() {
 	if (typeof internalInstanceKey !== 'undefined') {
 		return internalInstanceKey
@@ -23,6 +23,14 @@ export function garbage(node) {
 		node[key] = node[key]._hostNode = node[key]._hostParent = null
 	}
 }
+
+export function resetNode(node) {
+	if (node && node.style) {
+		node.style.cssText = ''
+		// node.className = '' // only reset style
+	}
+}
+// qreact end
 
 export function extend(obj, props) {
 	if (props) {

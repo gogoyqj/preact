@@ -1,4 +1,7 @@
-import { toLowerCase } from '../util';
+// qreact begin
+// import { toLowerCase } from '../util';
+import { toLowerCase, resetNode, } from '../util';
+// qreact end
 import { removeNode } from './index';
 
 /** DOM node pool, keyed on nodeName. */
@@ -9,9 +12,9 @@ export function collectNode(node) {
 	removeNode(node);
 
 	if (node instanceof Element) {
-		// reset node properties
-        node.style.cssText = ''
-        node.className = ''
+		// qreact begin
+		resetNode(node)
+		// qreact end
 
 		node._component = node._componentConstructor = null;
 

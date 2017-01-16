@@ -1,6 +1,9 @@
 import { NON_DIMENSION_PROPS, NON_BUBBLING_EVENTS } from '../constants';
 import options from '../options';
+// qreact begin
+// import { toLowerCase, isString, isFunction, hashToClassName } from '../util';
 import { toLowerCase, isString, isFunction, hashToClassName, garbage } from '../util';
+// qreact end
 
 
 
@@ -8,7 +11,9 @@ import { toLowerCase, isString, isFunction, hashToClassName, garbage } from '../
 /** Removes a given DOM Node from its parent. */
 export function removeNode(node) {
 	let p = node.parentNode;
+	// qreact begin
 	garbage(node)
+	// qreact end
 	if (p) p.removeChild(node);
 }
 
@@ -54,7 +59,7 @@ export function setAccessor(node, name, old, value, isSvg, inst) {
 		if (value) node.innerHTML = value.__html || '';
 	}
 	else if (name[0]=='o' && name[1]=='n') {
-		// fork add to 
+		// qreact begin 
 		if (typeof qreact_event !== 'undefined') {
 			qreact_event(node, name, value, inst)
         } else {
@@ -70,6 +75,18 @@ export function setAccessor(node, name, old, value, isSvg, inst) {
 			}
 			l[name] = value;
         }
+ 		// let l = node._listeners || (node._listeners = {});
+		// name = toLowerCase(name.substring(2));
+		// // @TODO: this might be worth it later, un-breaks focus/blur bubbling in IE9:
+		// // if (node.attachEvent) name = name=='focus'?'focusin':name=='blur'?'focusout':name;
+		// if (value) {
+		// 	if (!l[name]) node.addEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
+		// }
+		// else if (l[name]) {
+		// 	node.removeEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
+		// }
+		// l[name] = value;
+        // qreact end
 	}
 	else if (name!=='list' && name!=='type' && !isSvg && name in node) {
 		setProperty(node, name, value==null ? '' : value);
