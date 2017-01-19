@@ -11,9 +11,4 @@ export function VNode(nodeName, attributes, children) {
 
 	/** Reference to the given key. */
 	this.key = attributes && attributes.key;
-    
-    // qreact begin
-    // fork add to support react event sys
-    this._hostParent = this._hostNode = this._rootNodeID = null;
-    // qreact end
 }

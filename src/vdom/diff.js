@@ -41,16 +41,23 @@ export function flushMounts() {
  *	@returns {Element} dom			The created/mutated element
  *	@private
  */
+
+/**
+ * vnode
+ */
 export function diff(dom, vnode, context, mountAll, parent, componentRoot) {
 	// diffLevel having been 0 here indicates initial entry into the diff (not a subdiff)
+	// 如果 diffLevel 为 0
 	if (!diffLevel++) {
 		// when first starting the diff, check if we're diffing an SVG or within an SVG
+		// 是否在 svg 中
 		isSvgMode = parent instanceof SVGElement;
 
 		// hydration is inidicated by the existing element to be diffed not having a prop cache
 		hydrating = dom && !(ATTR_KEY in dom);
 	}
 
+	// 在这里调用 idiff 来进行 diff, 这里面进行了节点的更新，返回的根节点
 	let ret = idiff(dom, vnode, context, mountAll);
 
 	// append the element if its a new parent
@@ -77,6 +84,8 @@ function idiff(dom, vnode, context, mountAll) {
 
 
 	// Resolve ephemeral Pure Functional Components
+	// 如果 vnode 是一个函数就执行函数得到结果，函数返回的可能还是一个纯函数组件
+	// 这里需要不断执行，知道结果不是函数
 	while (isFunctionalComponent(vnode)) {
 		vnode = buildFunctionalComponent(vnode, context);
 	}
@@ -96,6 +105,7 @@ function idiff(dom, vnode, context, mountAll) {
 		}
 		else {
 			// it wasn't a Text node: replace it with one and recycle the old Element
+			// 如果不是文本节点，对节点进行回收
 			if (dom) recollectNodeTree(dom);
 			dom = document.createTextNode(vnode);
 		}
@@ -107,6 +117,8 @@ function idiff(dom, vnode, context, mountAll) {
 
 
 	// If the VNode represents a Component, perform a component diff.
+	// 如果节点是一个普通的 Component
+	// 注意 isFunctionalComponent 检验是不是纯函数组件
 	if (isFunction(vnode.nodeName)) {
 		return buildComponentFromVNode(dom, vnode, context, mountAll);
 	}
@@ -126,6 +138,7 @@ function idiff(dom, vnode, context, mountAll) {
 	if (!dom) {
 		// case: we had no element to begin with
 		// - create an element with the nodeName from VNode
+		// 调用 createElement(NS) 来创建 DOM 节点
 		out = createNode(nodeName, isSvgMode);
 		// qreact begin
 		vnode && loseup(vnode, out)

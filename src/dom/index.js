@@ -1,9 +1,11 @@
 import { NON_DIMENSION_PROPS, NON_BUBBLING_EVENTS } from '../constants';
 import options from '../options';
-// qreact begin
-// import { toLowerCase, isString, isFunction, hashToClassName } from '../util';
-import { toLowerCase, isString, isFunction, hashToClassName, garbage } from '../util';
-// qreact end
+
+import { toLowerCase, isString, isFunction, hashToClassName } from '../util';
+
+// m-start
+import { garbage } from '../util';
+// m-end
 
 
 
@@ -11,9 +13,9 @@ import { toLowerCase, isString, isFunction, hashToClassName, garbage } from '../
 /** Removes a given DOM Node from its parent. */
 export function removeNode(node) {
 	let p = node.parentNode;
-	// qreact begin
-	garbage(node)
-	// qreact end
+	// m-start
+	garbage(node);
+	// m-end
 	if (p) p.removeChild(node);
 }
 
@@ -43,42 +45,45 @@ export function setAccessor(node, name, old, value, isSvg, inst) {
 		node.className = value || '';
 	}
 	else if (name==='style') {
-		// qreact begin
-		setStyleAccessor(node, name, old, value);
-		// qreact end
+		// m-start
+		if (options.style){
+			return options.style(node, name, old, value);
+		}
+		// m-end
+
+		if (!value || isString(value) || isString(old)) {
+			node.style.cssText = value || '';
+		}
+		if (value && typeof value==='object') {
+			if (!isString(old)) {
+				for (let i in old) if (!(i in value)) node.style[i] = '';
+			}
+			for (let i in value) {
+				node.style[i] = typeof value[i]==='number' && !NON_DIMENSION_PROPS[i] ? (value[i]+'px') : value[i];
+			}
+		}
 	}
 	else if (name==='dangerouslySetInnerHTML') {
 		if (value) node.innerHTML = value.__html || '';
 	}
 	else if (name[0]=='o' && name[1]=='n') {
-		// qreact begin
-		if (typeof qreact_event !== 'undefined') {
-			qreact_event(node, name, value, inst)
-        } else {
-			let l = node._listeners || (node._listeners = {});
-			name = toLowerCase(name.substring(2));
-			// @TODO: this might be worth it later, un-breaks focus/blur bubbling in IE9:
-			// if (node.attachEvent) name = name=='focus'?'focusin':name=='blur'?'focusout':name;
-			if (value) {
-				if (!l[name]) node.addEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
-			}
-			else if (l[name]) {
-				node.removeEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
-			}
-			l[name] = value;
-        }
- 		// let l = node._listeners || (node._listeners = {});
-		// name = toLowerCase(name.substring(2));
-		// // @TODO: this might be worth it later, un-breaks focus/blur bubbling in IE9:
-		// // if (node.attachEvent) name = name=='focus'?'focusin':name=='blur'?'focusout':name;
-		// if (value) {
-		// 	if (!l[name]) node.addEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
-		// }
-		// else if (l[name]) {
-		// 	node.removeEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
-		// }
-		// l[name] = value;
-        // qreact end
+		// m-start
+		if (options.event){
+			return options.event(node, name, value, inst);
+		}
+		// m-end
+
+		let l = node._listeners || (node._listeners = {});
+		name = toLowerCase(name.substring(2));
+		// @TODO: this might be worth it later, un-breaks focus/blur bubbling in IE9:
+		// if (node.attachEvent) name = name=='focus'?'focusin':name=='blur'?'focusout':name;
+		if (value) {
+			if (!l[name]) node.addEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
+		}
+		else if (l[name]) {
+			node.removeEventListener(name, eventProxy, !!NON_BUBBLING_EVENTS[name]);
+		}
+		l[name] = value;
 	}
 	else if (name!=='list' && name!=='type' && !isSvg && name in node) {
 		setProperty(node, name, value==null ? '' : value);
@@ -96,56 +101,6 @@ export function setAccessor(node, name, old, value, isSvg, inst) {
 		}
 	}
 }
-
-// qreact begin
-// 设置style
-function setStyleAccessor(node,name,old,value){
-	// value是string的，直接赋值 ？ react是怎么处理的？
-	if (!value || isString(value) || isString(old)) {
-		node.style.cssText = value || '';
-	}
-	// value是对象的
-	if (value && typeof value==='object') {
-		// todo 判断styles.hasOwnProperty?
-		//如果上一个style存在且为对象的，循环，有属性是上次有而此次style没有的，置空
-		if (!isString(old)) {
-			for (let i in old) if (!(i in value)) node.style[i] = '';
-		}
-		// 添加css
-		// todo 增加默认的样式等等
-		for (let i in value) {
-			if(!value.hasOwnProperty(i)){
-					continue;
-			}
-			var styleValue = transStyleValue(i,value[i]);
-			// mobile不用考虑IE8，直接转换为cssFloat，也不用做细拆分
-			if (i === 'float') {
-        i = 'cssFloat';
-      }
-			node.style[i] = styleValue || '';
-		}
-	}
-}
-
-
-function transStyleValue(name,value){
-     // 考虑空值，布尔值等
-     if (value == null || typeof value === 'boolean' || value === '') {
-         return '';
-     }
-
-     // 只接受正值的呢？
-
-     // 转换单位,更细致的转换方法，包括borderWidth:'1'也会转化为1px，而width:0 就不用转化了
-     if (isNaN(value) || value === 0 || NON_DIMENSION_PROPS.hasOwnProperty(name) && NON_DIMENSION_PROPS[name]) {
-         return '' + value;
-     }
-     if (typeof value === 'string') {
-       value = value.trim();
-     }
-     return value + 'px';
-}
-// qreact end
 
 /** Attempt to set a DOM property to the given value.
  *	IE & FF throw for certain property-value combinations.

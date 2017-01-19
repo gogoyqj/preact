@@ -1,3 +1,7 @@
+import style from './options/style';
+import event from './options/event';
+
+
 /** Global options
  *	@public
  *	@namespace options {Object}
@@ -14,7 +18,18 @@ export default {
 	/** Processes all created VNodes.
 	 *	@param {VNode} vnode	A newly-created VNode to normalize/process
 	 */
-	//vnode(vnode) { }
+	vnode(vnode) {
+		// fork add to support react event sys
+		vnode._hostParent = null;
+		vnode._hostNode = null;
+		vnode._rootNodeID = null;
+	},
+
+	/** Hook for style process */
+	style,
+
+	/** Hook for event handle */
+	event
 
 	/** Hook invoked after a component is mounted. */
 	// afterMount(component) { }
