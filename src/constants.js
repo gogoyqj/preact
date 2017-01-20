@@ -10,13 +10,13 @@ export const EMPTY = {};
 export const ATTR_KEY = typeof Symbol!=='undefined' ? Symbol.for('preactattr') : '__preactattr_';
 
 
-// qreact begin
+// m-start
 // 对照react补齐isUnitlessNumber的属性
-var not_dimension_props_without_profixes = {
+let not_dimension_props_without_profixes = {
 	animationIterationCount: 1,
-  borderImageOutset: 1,
-  borderImageSlice: 1,
-  borderImageWidth: 1,
+	borderImageOutset: 1,
+	borderImageSlice: 1,
+	borderImageWidth: 1,
 	boxFlex:1,
 	boxFlexGroup:1,
 	boxOrdinalGroup: 1,
@@ -29,7 +29,7 @@ var not_dimension_props_without_profixes = {
 	flexNegative:1,
 	flexOrder: 1,
 	gridRow: 1,
-  gridColumn: 1,
+	gridColumn: 1,
 	fontWeight:1,
 	lineClamp:1,
 	lineHeight:1,
@@ -40,7 +40,7 @@ var not_dimension_props_without_profixes = {
 	tabSize: 1,
 	widows:1,
 	zIndex:1,
-	zoom:1,
+	zoom:1
   // fillOpacity: 1,
   // floodOpacity: 1,
   // stopOpacity: 1,
@@ -53,20 +53,20 @@ var not_dimension_props_without_profixes = {
 
 // 补齐前缀
 function prefixKey(prefix, key) {
-    return prefix + key.charAt(0).toUpperCase() + key.substring(1)
+	return prefix + key.charAt(0).toUpperCase() + key.substring(1);
 }
 
 let prefixes = ['Webkit', 'ms', 'Moz', 'O']
 
 
-Object.keys(not_dimension_props_without_profixes).forEach(function(prop) {
-    prefixes.forEach(function(prefix) {
-        not_dimension_props_without_profixes[prefixKey(prefix, prop)] = 1
-    })
-})
+Object.keys(not_dimension_props_without_profixes).forEach((prop) => {
+	prefixes.forEach((prefix) => {
+		not_dimension_props_without_profixes[prefixKey(prefix, prop)] = 1;
+	});
+});
 
 export const NON_DIMENSION_PROPS = not_dimension_props_without_profixes;
-// qreact end
+// m-end
 
 
 

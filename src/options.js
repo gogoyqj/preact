@@ -1,7 +1,7 @@
 import style from './options/style';
 import event from './options/event';
 
-/* 
+/*
  * @private
  * @description ensure each vnode has a stable and unique key
  */
@@ -55,7 +55,7 @@ export default {
 		vnode._hostParent = null;
 		vnode._hostNode = null;
 		vnode._rootNodeID = null;
-		recomputeKey(vnode.children)
+		recomputeKey(vnode.children);
 	},
 
 	/** Hook for style process */

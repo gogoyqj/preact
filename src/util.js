@@ -3,34 +3,35 @@
  *	@private
  */
 
-// qreact begin
+
+// m-start
 function getInternalInstanceKey() {
 	if (typeof internalInstanceKey !== 'undefined') {
-		return internalInstanceKey
+		return internalInstanceKey;
 	}
 }
 
 export function loseup(inst, node) {
-	var key = getInternalInstanceKey()
-  	if (key) {
-	  	qreact_event.precacheNode(inst, node)
-  	}
+	let key = getInternalInstanceKey()
+	if (key) {
+		ReactEventBridge.precacheNode(inst, node)
+	}
 }
 
 export function garbage(node) {
 	var key = getInternalInstanceKey()
 	if (node[key]) {
-		qreact_event.garbage(node, key)
+		ReactEventBridge.garbage(node, key)
 	}
 }
 
 export function resetNode(node) {
 	if (node && node.style) {
-		node.style.cssText = ''
+		node.style.cssText = '';
 		// node.className = '' // only reset style
 	}
 }
-// qreact end
+// m-end
 
 export function extend(obj, props) {
 	if (props) {

@@ -29,7 +29,6 @@ export function h(nodeName, attributes) {
 	while (stack.length) {
 		// 处理 child 是数组的情况
 		if ((child = stack.pop()) instanceof Array) {
-			var outerKey = stack.length
 			for (i=child.length; i--; ) {
 				stack.push(child[i]);
 			}

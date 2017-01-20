@@ -1,9 +1,9 @@
 import { SYNC_RENDER, NO_RENDER, FORCE_RENDER, ASYNC_RENDER, ATTR_KEY } from '../constants';
 import options from '../options';
-// qreact begin
+// m-start
 // import { isFunction, clone, extend } from '../util';
 import { isFunction, clone, extend, resetNode } from '../util';
-// qreact end
+// m-end
 import { enqueueRender } from '../render-queue';
 import { getNodeProps } from './index';
 import { diff, mounts, diffLevel, flushMounts, recollectNodeTree } from './diff';
