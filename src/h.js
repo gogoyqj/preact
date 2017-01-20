@@ -29,7 +29,17 @@ export function h(nodeName, attributes) {
 	while (stack.length) {
 		// 处理 child 是数组的情况
 		if ((child = stack.pop()) instanceof Array) {
-			for (i=child.length; i--; ) stack.push(child[i]);
+			var outerKey = stack.length
+			for (i=child.length; i--; ) {
+                var props = child[i] && child[i].attributes;
+                if (props && 'undefined' != typeof props.key) {
+                    if (!('okey' in props)) {
+                    	props.okey = props.key;
+                    	props.key = '$' + outerKey + ':' + props.key;
+                    }
+                }
+				stack.push(child[i]);
+			}
 		}
 		else if (child!=null && child!==true && child!==false) {
 			if (typeof child=='number') child = String(child);

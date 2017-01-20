@@ -29,7 +29,7 @@ export default {
 	style,
 
 	/** Hook for event handle */
-	event
+	_event: event
 
 	/** Hook invoked after a component is mounted. */
 	// afterMount(component) { }
