@@ -1,5 +1,5 @@
 let event = function () {
-    qreact_event.apply(null, arguments)
+    qreact_event.apply(null, arguments);
 };
 
 export default event;

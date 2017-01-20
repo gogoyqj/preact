@@ -210,6 +210,7 @@ function idiff(dom, vnode, context, mountAll) {
  *	@param {Boolean} absorb		If `true`, consumes externally created elements similar to hydration
  */
 function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
+	// 原 DOM 节点
 	let originalChildren = dom.childNodes,
 		children = [],
 		keyed = {},
@@ -220,21 +221,25 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
 		vlen = vchildren && vchildren.length,
 		j, c, vchild, child;
 
+	// 如果有子节点
 	if (len) {
 		for (let i=0; i<len; i++) {
 			let child = originalChildren[i],
 				props = child[ATTR_KEY],
 				key = vlen ? ((c = child._component) ? c.__key : props ? props.key : null) : null;
+			// 通过 key 来记录下 child 节点
 			if (key!=null) {
 				keyedLen++;
 				keyed[key] = child;
 			}
+			// 这几个单词太诡异，不太懂
 			else if (hydrating || absorb || props) {
 				children[childrenLen++] = child;
 			}
 		}
 	}
 
+	// 如果有 vnode
 	if (vlen) {
 		for (let i=0; i<vlen; i++) {
 			vchild = vchildren[i];
@@ -245,22 +250,30 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
 			// }
 
 			// attempt to find a node based on key matching
+			// 拿到 key
 			let key = vchild.key;
 			if (key!=null) {
+				// 使用 key 从 keyed 这个 map 中寻找 DOM 节点
 				if (keyedLen && key in keyed) {
+					// 找到后，将 key 对应的值置空
 					child = keyed[key];
 					keyed[key] = undefined;
+					// 减小 map 记录的长度
 					keyedLen--;
 				}
 			}
 			// attempt to pluck a node of the same type from the existing children
+
+			// 如果 key 是空的，从回收的子节点中找一个同类的
 			else if (!child && min<childrenLen) {
 				for (j=min; j<childrenLen; j++) {
 					c = children[j];
+					// 找一个同类的节点
 					if (c && isSameNodeType(c, vchild)) {
 						child = c;
 						children[j] = undefined;
 						if (j===childrenLen-1) childrenLen--;
+						// min 记录了原位置和 diff 后位置开始错乱的起始点
 						if (j===min) min++;
 						break;
 					}
@@ -268,23 +281,31 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
 			}
 
 			// morph the matched/found/created DOM child to match vchild (deep)
+			// 在对 child 进行 diff
 			child = idiff(child, vchild, context, mountAll);
 
+			// 如果得出的 child 不同
 			if (child && child!==dom) {
+				// 虚拟 Node 表示的 child 比真实 child 多
+				// 追加之
 				if (i>=len) {
 					dom.appendChild(child);
 				}
+				// diff 出来的 DOM 和原来不同
 				else if (child!==originalChildren[i]) {
+					// 如果和原来位置的后一个相同，说明需要移除原位置的 DOM 节点
 					if (child===originalChildren[i+1]) {
 						removeNode(originalChildren[i]);
 					}
+					// why? 既然上面比较是有可能和后一个相同，这里为什么还要插入
+					// 插入节点
 					dom.insertBefore(child, originalChildren[i] || null);
 				}
 			}
 		}
 	}
 
-
+	// 如果还有没有用完的 child 回收之
 	if (keyedLen) {
 		for (let i in keyed) if (keyed[i]) recollectNodeTree(keyed[i]);
 	}
@@ -304,9 +325,9 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
  */
 export function recollectNodeTree(node, unmountOnly) {
 	let component = node._component;
-	// qreact begin
-	garbage(node)
-	// qreact end
+	// m-start
+	garbage(node);
+	// m-end
 	if (component) {
 		// if node is owned by a Component, unmount that component (ends up recursing back here)
 		unmountComponent(component, !unmountOnly);
@@ -323,6 +344,7 @@ export function recollectNodeTree(node, unmountOnly) {
 		// Recollect/unmount all children.
 		// - we use .lastChild here because it causes less reflow than .firstChild
 		// - it's also cheaper than accessing the .childNodes Live NodeList
+		// 递归地回收所有子节点
 		let c;
 		while ((c=node.lastChild)) recollectNodeTree(c, unmountOnly);
 	}

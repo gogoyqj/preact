@@ -100,18 +100,23 @@ export function renderComponent(component, opts, mountAll, isChild) {
 	component.prevProps = component.prevState = component.prevContext = component.nextBase = null;
 	component._dirty = false;
 
+	// 如果不跳过
 	if (!skip) {
+		// 渲染得到新的 vDOM
+
+		// 普通组件
 		if (component.render) rendered = component.render(props, state, context);
 
 		// context to pass to the child, can be updated via (grand-)parent component
 		if (component.getChildContext) {
 			context = extend(clone(context), component.getChildContext());
 		}
-
+		// 纯函数组件
 		while (isFunctionalComponent(rendered)) {
 			rendered = buildFunctionalComponent(rendered, context);
 		}
 
+		// 拿到渲染得到的 DOM 节点
 		let childComponent = rendered && rendered.nodeName,
 			toUnmount, base;
 
@@ -260,9 +265,9 @@ export function unmountComponent(component, remove) {
 
 	if (component.componentWillUnmount) component.componentWillUnmount();
 
-	// qreact begin
-	resetNode(component.base)
-	// qreact end
+	// m-start
+	resetNode(component.base);
+	// m-end
 	component.base = null;
 
 	// recursively tear down & recollect high-order component children:
