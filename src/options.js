@@ -1,34 +1,43 @@
 import style from './options/style';
 import event from './options/event';
 
+/* 
+ * @private
+ * @description ensure each vnode has a stable and unique key
+ */
+function recomputeKey (children) {
+	children = children || []
+	var keyMap = {}, outerKey = 0, keyArr = [], varUndefined
+
+	// set key and reset keyMap, keyArr
+	function setKey() {
+		keyArr.splice(0).forEach(function (info) {
+	        info[2].key = info[0].key = '.' + outerKey + ':$' + String(info[1]).replace(/^\.[\S]+:\$/g, '');
+	    });
+		keyMap = {}
+	}
+	children.forEach(function(vnode) {
+		var props = vnode && vnode.attributes || {},
+			key = props.key,
+			invalidKey = key === varUndefined && ++outerKey
+		// duplicate key
+		if (key in keyMap) ++outerKey && setKey()
+		// vnode has no key
+		if (invalidKey) {
+			setKey()
+		// props, origin key, vnode
+		} else {
+			keyArr.push([props, keyMap[key] = key, vnode])
+		}
+	})
+	// last !! outerKey++ NOT ++outerKey
+    outerKey++ && setKey();
+}
 
 /** Global options
  *	@public
  *	@namespace options {Object}
  */
-
-function recomputeKey (vnode) {
-	var children = vnode.children || [], keyMap = {}, cnt = 0, keyArr = [], last = children.length - 1
-
-	children.forEach(function(child, i) {
-		var props = child.attributes || {},
-			key = props.key,
-			invalidKey = key === recomputeKey.x && ++cnt
-		if (invalidKey || key in keyMap || i === last) {
-			if (keyArr.length) {
-				keyArr.forEach(function(info) {
-					info[2].key = info[0].key = '.' + cnt + ':$' + String(info[1]).replace(/^\.[\S]+:\$/g, '')
-				})
-				keyMap = {}
-				keyArr = []
-				cnt++
-			}
-		}
-		!invalidKey && keyArr.push([props, keyMap[key] = key, child])
-	})
-	keyMap = keyArr = null
-}
-
 export default {
 
 	/** If `true`, `prop` changes trigger synchronous component updates.
@@ -46,7 +55,7 @@ export default {
 		vnode._hostParent = null;
 		vnode._hostNode = null;
 		vnode._rootNodeID = null;
-		recomputeKey(vnode)
+		recomputeKey(vnode.children)
 	},
 
 	/** Hook for style process */
