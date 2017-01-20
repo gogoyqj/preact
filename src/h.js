@@ -31,13 +31,6 @@ export function h(nodeName, attributes) {
 		if ((child = stack.pop()) instanceof Array) {
 			var outerKey = stack.length
 			for (i=child.length; i--; ) {
-                var props = child[i] && child[i].attributes;
-                if (props && 'undefined' != typeof props.key) {
-                    if (!('okey' in props)) {
-                    	props.okey = props.key;
-                    	props.key = '$' + outerKey + ':' + props.key;
-                    }
-                }
 				stack.push(child[i]);
 			}
 		}

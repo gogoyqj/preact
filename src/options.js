@@ -6,6 +6,29 @@ import event from './options/event';
  *	@public
  *	@namespace options {Object}
  */
+
+function recomputeKey (vnode) {
+	var children = vnode.children || [], keyMap = {}, cnt = 0, keyArr = [], last = children.length - 1
+
+	children.forEach(function(child, i) {
+		var props = child.attributes || {},
+			key = props.key,
+			invalidKey = key === recomputeKey.x && ++cnt
+		if (invalidKey || key in keyMap || i === last) {
+			if (keyArr.length) {
+				keyArr.forEach(function(info) {
+					info[2].key = info[0].key = '.' + cnt + ':$' + String(info[1]).replace(/^\.[\S]+:\$/g, '')
+				})
+				keyMap = {}
+				keyArr = []
+				cnt++
+			}
+		}
+		!invalidKey && keyArr.push([props, keyMap[key] = key, child])
+	})
+	keyMap = keyArr = null
+}
+
 export default {
 
 	/** If `true`, `prop` changes trigger synchronous component updates.
@@ -23,6 +46,7 @@ export default {
 		vnode._hostParent = null;
 		vnode._hostNode = null;
 		vnode._rootNodeID = null;
+		recomputeKey(vnode)
 	},
 
 	/** Hook for style process */
