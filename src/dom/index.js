@@ -68,8 +68,8 @@ export function setAccessor(node, name, old, value, isSvg, inst) {
 	}
 	else if (name[0]=='o' && name[1]=='n') {
 		// m-start
-		if (options._event){
-			return options._event(node, name, value, inst);
+		if (options.handleEvent){
+			return options.handleEvent(node, name, value, inst);
 		}
 		// m-end
 

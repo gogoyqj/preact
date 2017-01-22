@@ -3,6 +3,7 @@
  *	@private
  */
 
+/* global ReactEventBridge:false, internalInstanceKey:false */
 
 // m-start
 function getInternalInstanceKey() {

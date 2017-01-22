@@ -63,9 +63,9 @@ export function diff(dom, vnode, context, mountAll, parent, componentRoot) {
 	// append the element if its a new parent
 	if (parent && ret.parentNode!==parent) {
 		parent.appendChild(ret);
-		// qreact begin
-		loseup(vnode, ret)
-		// qreact end
+		// m-start
+		loseup(vnode, ret);
+		// m-end
 	}
 
 	// diffLevel being reduced to 0 means we're exiting the diff
@@ -141,7 +141,7 @@ function idiff(dom, vnode, context, mountAll) {
 		// 调用 createElement(NS) 来创建 DOM 节点
 		out = createNode(nodeName, isSvgMode);
 		// qreact begin
-		vnode && loseup(vnode, out)
+		vnode && loseup(vnode, out);
 		// qreact end
 	}
 	else if (!isNamedNode(dom, nodeName)) {
@@ -151,7 +151,7 @@ function idiff(dom, vnode, context, mountAll) {
 
 		out = createNode(nodeName, isSvgMode);
 		// qreact begin
-		vnode && loseup(vnode, out)
+		vnode && loseup(vnode, out);
 		// qreact end
 
 		// move children into the replacement node
