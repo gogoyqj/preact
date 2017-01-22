@@ -4,7 +4,7 @@ import options from '../options';
 import { toLowerCase, isString, isFunction, hashToClassName } from '../util';
 
 // m-start
-import { garbage } from '../util';
+import { recycle } from '../util';
 // m-end
 
 
@@ -14,7 +14,7 @@ import { garbage } from '../util';
 export function removeNode(node) {
 	let p = node.parentNode;
 	// m-start
-	garbage(node);
+	recycle(node);
 	// m-end
 	if (p) p.removeChild(node);
 }

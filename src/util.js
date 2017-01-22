@@ -12,16 +12,16 @@ function getInternalInstanceKey() {
 }
 
 export function loseup(inst, node) {
-	let key = getInternalInstanceKey()
+	let key = getInternalInstanceKey();
 	if (key) {
-		ReactEventBridge.precacheNode(inst, node)
+		ReactEventBridge.precacheNode(inst, node);
 	}
 }
 
-export function garbage(node) {
-	var key = getInternalInstanceKey()
+export function recycle(node) {
+	let key = getInternalInstanceKey();
 	if (node[key]) {
-		ReactEventBridge.recycle(node, key)
+		ReactEventBridge.recycle(node, key);
 	}
 }
 

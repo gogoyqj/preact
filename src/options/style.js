@@ -1,7 +1,7 @@
 import { NON_DIMENSION_PROPS } from '../constants';
 import { isString } from '../util';
 
-// qreact begin
+// m-start
 // 设置style
 function style(node,name,old,value){
 	// value是string的，直接赋值 ？ react是怎么处理的？
@@ -49,7 +49,7 @@ function transStyleValue(name,value){
 	}
 	return value + 'px';
 }
-// qreact end
+// m-end
 
 
 export default style;

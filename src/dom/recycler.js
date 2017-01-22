@@ -1,6 +1,6 @@
 // qreact begin
 // import { toLowerCase } from '../util';
-import { toLowerCase, resetNode, } from '../util';
+import { toLowerCase, resetNode } from '../util';
 // qreact end
 import { removeNode } from './index';
 
@@ -13,7 +13,7 @@ export function collectNode(node) {
 
 	if (node instanceof Element) {
 		// qreact begin
-		resetNode(node)
+		resetNode(node);
 		// qreact end
 
 		node._component = node._componentConstructor = null;

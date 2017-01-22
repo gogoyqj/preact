@@ -1,7 +1,7 @@
 import { ATTR_KEY } from '../constants';
 // qreact begin
 // import { isString, isFunction } from '../util';
-import { isString, isFunction, garbage, loseup } from '../util';
+import { isString, isFunction, recycle, loseup } from '../util';
 // qreact end
 import { isSameNodeType, isNamedNode } from './index';
 import { isFunctionalComponent, buildFunctionalComponent } from './functional-component';
@@ -326,7 +326,7 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
 export function recollectNodeTree(node, unmountOnly) {
 	let component = node._component;
 	// m-start
-	garbage(node);
+	recycle(node);
 	// m-end
 	if (component) {
 		// if node is owned by a Component, unmount that component (ends up recursing back here)
