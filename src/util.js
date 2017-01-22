@@ -21,7 +21,7 @@ export function loseup(inst, node) {
 export function garbage(node) {
 	var key = getInternalInstanceKey()
 	if (node[key]) {
-		ReactEventBridge.garbage(node, key)
+		ReactEventBridge.recycle(node, key)
 	}
 }
 
