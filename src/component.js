@@ -85,8 +85,9 @@ extend(Component.prototype, {
 	/** Immediately perform a synchronous re-render of the component.
 	 *	@private
 	 */
-	forceUpdate() {
+	forceUpdate(callback) {
 		renderComponent(this, FORCE_RENDER);
+		if (typeof callback === 'function') callback();
 	},
 
 
