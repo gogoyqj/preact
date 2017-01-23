@@ -23,12 +23,15 @@ export function setComponentProps(component, props, opts, context, mountAll) {
 	if (component._disable) return;
 	component._disable = true;
 
+	// 保存下 ref 和 key
 	if ((component.__ref = props.ref)) delete props.ref;
 	if ((component.__key = props.key)) delete props.key;
 
+	// 如果没有对应的 DOM 节点，说明是首次挂载
 	if (!component.base || mountAll) {
 		if (component.componentWillMount) component.componentWillMount();
 	}
+	// 否则是更新
 	else if (component.componentWillReceiveProps) {
 		component.componentWillReceiveProps(props, context);
 	}
@@ -52,6 +55,7 @@ export function setComponentProps(component, props, opts, context, mountAll) {
 		}
 	}
 
+	// 执行 ref
 	if (component.__ref) component.__ref(component);
 }
 
@@ -73,6 +77,7 @@ export function renderComponent(component, opts, mountAll, isChild) {
 		previousProps = component.prevProps || props,
 		previousState = component.prevState || state,
 		previousContext = component.prevContext || context,
+		// 如果该组件的实例关联了 DOM 节点，说明是更新
 		isUpdate = component.base,
 		nextBase = component.nextBase,
 		initialBase = isUpdate || nextBase,
@@ -84,6 +89,7 @@ export function renderComponent(component, opts, mountAll, isChild) {
 		component.props = previousProps;
 		component.state = previousState;
 		component.context = previousContext;
+		// 执行 shouldComponentUpdate
 		if (opts!==FORCE_RENDER
 			&& component.shouldComponentUpdate
 			&& component.shouldComponentUpdate(props, state, context) === false) {
@@ -210,36 +216,44 @@ export function renderComponent(component, opts, mountAll, isChild) {
  *	@private
  */
 export function buildComponentFromVNode(dom, vnode, context, mountAll) {
+	// c 表示这个 DOM 节点对应的 component，如果是初次挂载那么 dom 为 null
 	let c = dom && dom._component,
 		originalComponent = c,
 		oldDom = dom,
 		isDirectOwner = c && dom._componentConstructor===vnode.nodeName,
 		isOwner = isDirectOwner,
 		props = getNodeProps(vnode);
+
+	// 判断这个 dom 节点是不是 VNode 的所有者
 	while (c && !isOwner && (c=c._parentComponent)) {
 		isOwner = c.constructor===vnode.nodeName;
 	}
-
+	// 是
 	if (c && isOwner && (!mountAll || c._component)) {
 		setComponentProps(c, props, ASYNC_RENDER, context, mountAll);
 		dom = c.base;
 	}
+	// 不是
 	else {
+		// 如果已经挂载，需要卸掉
 		if (originalComponent && !isDirectOwner) {
 			unmountComponent(originalComponent, true);
 			dom = oldDom = null;
 		}
-
+		// 重新创建 component
 		c = createComponent(vnode.nodeName, props, context);
 		if (dom && !c.nextBase) {
 			c.nextBase = dom;
 			// passing dom/oldDom as nextBase will recycle it if unused, so bypass recycling on L241:
 			oldDom = null;
 		}
+		// 设置属性
 		setComponentProps(c, props, SYNC_RENDER, context, mountAll);
+		// 创建的 DOM 节点在 base 上
 		dom = c.base;
-
+		// 如果发现 DOM 被改变了
 		if (oldDom && dom!==oldDom) {
+			// 回收节点
 			oldDom._component = null;
 			recollectNodeTree(oldDom);
 		}

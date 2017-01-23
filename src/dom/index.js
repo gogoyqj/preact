@@ -47,7 +47,7 @@ export function setAccessor(node, name, old, value, isSvg, inst) {
 	else if (name==='style') {
 		// m-start
 		if (options.style){
-			return options.style(node, name, old, value);
+			return options.processStyle(node, name, old, value);
 		}
 		// m-end
 

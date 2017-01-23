@@ -1,7 +1,7 @@
-// qreact begin
+// m-start
 // import { toLowerCase } from '../util';
 import { toLowerCase, resetNode } from '../util';
-// qreact end
+// m-end
 import { removeNode } from './index';
 
 /** DOM node pool, keyed on nodeName. */
@@ -12,9 +12,9 @@ export function collectNode(node) {
 	removeNode(node);
 
 	if (node instanceof Element) {
-		// qreact begin
+		// m-start
 		resetNode(node);
-		// qreact end
+		// m-end
 
 		node._component = node._componentConstructor = null;
 

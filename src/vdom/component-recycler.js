@@ -16,8 +16,10 @@ export function collectComponent(component) {
 
 
 export function createComponent(Ctor, props, context) {
+	// 这里的 Ctor 是使用 extends Component 得到的组件构造函数
 	let inst = new Ctor(props, context),
 		list = components[Ctor.name];
+	// 为啥这里还要这么做一次 ？
 	Component.call(inst, props, context);
 	if (list) {
 		for (let i=list.length; i--; ) {
