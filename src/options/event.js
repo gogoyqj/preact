@@ -1,5 +1,5 @@
 let event = function () {
-    ReactEventBridge & ReactEventBridge.connect.apply(null, arguments);
+    ReactEventBridge & ReactEventBridge.apply(null, arguments);
 };
 
 export default event;

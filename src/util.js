@@ -5,6 +5,8 @@
 
 
 // m-start
+import options from './options';
+import { ATTR_KEY } from './constants';
 function getInternalInstanceKey() {
 	if (typeof internalInstanceKey !== 'undefined') {
 		return internalInstanceKey;
@@ -27,7 +29,7 @@ export function recycle(node) {
 
 export function resetNode(node) {
 	if (node && node.style) {
-		node.style.cssText = '';
+	    options.style(node, 'name', '', node[ATTR_KEY].style || '') // reset style 
 		// node.className = '' // only reset style
 	}
 }

@@ -175,6 +175,10 @@ function idiff(dom, vnode, context, mountAll) {
 		for (let a=out.attributes, i=a.length; i--; ) props[a[i].name] = a[i].value;
 	}
 
+
+	// Apply attributes/props from VNode to the DOM Element:
+	diffAttributes(out, vnode.attributes, props, vnode);
+	
 	// Optimization: fast-path for elements containing a single TextNode:
 	if (!hydrating && vchildren && vchildren.length===1 && typeof vchildren[0]==='string' && fc && fc instanceof Text && !fc.nextSibling) {
 		if (fc.nodeValue!=vchildren[0]) {
@@ -185,10 +189,6 @@ function idiff(dom, vnode, context, mountAll) {
 	else if (vchildren && vchildren.length || fc) {
 		innerDiffNode(out, vchildren, context, mountAll, !!props.dangerouslySetInnerHTML);
 	}
-
-
-	// Apply attributes/props from VNode to the DOM Element:
-	diffAttributes(out, vnode.attributes, props, vnode);
 
 
 	// invoke original ref (from before resolving Pure Functional Components):
@@ -294,12 +294,23 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
 				// diff 出来的 DOM 和原来不同
 				else if (child!==originalChildren[i]) {
 					// 如果和原来位置的后一个相同，说明需要移除原位置的 DOM 节点
-					if (child===originalChildren[i+1]) {
-						removeNode(originalChildren[i]);
+					// if (child===originalChildren[i+1]) {
+					// 	removeNode(originalChildren[i]);
+					// }
+					if (dom === child.parentNode) {
+	                	var originalChild = originalChildren[i],
+	                		nextChild = originalChild.nextSibling
+	                	while(nextChild) {
+	                		if (nextChild === child) break
+	                		if (originalChild[ATTR_KEY].key !== null) {
+	                			recollectNodeTree(originalChild)
+	                		}
+	                		originalChild = nextChild
+	                		nextChild = originalChild.nextSibling
+	                	}
+					} else {
+						dom.insertBefore(child, originalChildren[i] || null);
 					}
-					// why? 既然上面比较是有可能和后一个相同，这里为什么还要插入
-					// 插入节点
-					dom.insertBefore(child, originalChildren[i] || null);
 				}
 			}
 		}
@@ -315,6 +326,7 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
 		child = children[childrenLen--];
 		if (child) recollectNodeTree(child);
 	}
+	document.body.scrollTop
 }
 
 
