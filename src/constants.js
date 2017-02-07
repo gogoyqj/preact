@@ -56,7 +56,7 @@ function prefixKey(prefix, key) {
 	return prefix + key.charAt(0).toUpperCase() + key.substring(1);
 }
 
-let prefixes = ['Webkit', 'ms', 'Moz', 'O']
+let prefixes = ['Webkit', 'ms', 'Moz', 'O'];
 
 
 Object.keys(not_dimension_props_without_profixes).forEach((prop) => {

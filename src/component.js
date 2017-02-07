@@ -87,6 +87,7 @@ extend(Component.prototype, {
 	 */
 	forceUpdate(callback) {
 		renderComponent(this, FORCE_RENDER);
+		// eslint-disable-next-line
 		if (typeof callback === 'function') callback();
 	},
 

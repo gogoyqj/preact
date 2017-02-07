@@ -3,6 +3,7 @@
  *	@private
  */
 
+/* global ReactEventBridge:false, internalInstanceKey:false */
 
 // m-start
 import options from './options';
@@ -29,7 +30,7 @@ export function recycle(node) {
 
 export function resetNode(node) {
 	if (node && node.style) {
-	    options.style(node, 'name', '', node[ATTR_KEY].style || '') // reset style 
+	    options.processStyle(node, 'name', '', node[ATTR_KEY].style || '') // reset style 
 		// node.className = '' // only reset style
 	}
 }

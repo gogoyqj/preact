@@ -1,5 +1,5 @@
-import style from './options/style';
-import event from './options/event';
+import processStyle from './options/processStyle';
+import handleEvent from './options/handleEvent';
 
 /*
  * @private
@@ -7,30 +7,36 @@ import event from './options/event';
  */
 function recomputeKey (children) {
 	children = children || []
-	var keyMap = {}, outerKey = 0, keyArr = [], varUndefined
+    var keyMap = {}, outerKey = 0, keyArr = []
 
-	// set key and reset keyMap, keyArr
-	function setKey() {
-		keyArr.splice(0).forEach(function (info) {
-	        info[2].key = info[0].key = '.' + outerKey + ':$' + String(info[1]).replace(/^\.[\S]+:\$/g, '');
-	    });
-		keyMap = {}
-	}
-	children.forEach(function(vnode) {
-		var props = vnode && vnode.attributes || {},
-			key = props.key,
-			invalidKey = key === varUndefined && ++outerKey
-		// duplicate key
-		if (key in keyMap) ++outerKey && setKey()
-		// vnode has no key
-		if (invalidKey) {
-			setKey()
-		// props, origin key, vnode
-		} else {
-			keyArr.push([props, keyMap[key] = key, vnode])
-		}
-	})
-	// last !! outerKey++ NOT ++outerKey
+    // set key and reset keyMap, keyArr
+    function setKey() {
+        keyArr.splice(0).forEach(function (info) {
+            info[2].key = info[0].key = '.' + outerKey + ':$' + String(info[1]).replace(/^\.[\S]+:\$/g, '');
+        });
+        keyMap = {}
+    }
+    children.forEach(function(vnode) {
+        var props = vnode && vnode.attributes || {},
+            key = props.key,
+            invalidKey = key === undefined && ++outerKey // has no key & outerKey > 0
+        // duplicate key
+        /* // better to understand
+		if (key in keyMap){
+            outerKey++;
+            setKey();
+        }
+        */
+        if (key in keyMap) ++outerKey && setKey()
+        // vnode has no key
+        if (invalidKey) {
+            setKey()
+        // props, origin key, vnode
+        } else {
+            keyArr.push([props, keyMap[key] = key, vnode])
+        }
+    })
+    // last !! outerKey++ NOT ++outerKey
     outerKey++ && setKey();
 }
 
@@ -59,10 +65,10 @@ export default {
 	},
 
 	/** Hook for style process */
-	style,
+	processStyle,
 
 	/** Hook for event handle */
-	_event: event
+	handleEvent
 
 	/** Hook invoked after a component is mounted. */
 	// afterMount(component) { }

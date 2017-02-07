@@ -44,16 +44,23 @@ export function flushMounts() {
 
 /**
  * vnode
+ *
+ * export function render(vnode, parent, merge) {
+ *	 return diff(merge, vnode, {}, false, parent);
+ * }
  */
+
+
+
 export function diff(dom, vnode, context, mountAll, parent, componentRoot) {
 	// diffLevel having been 0 here indicates initial entry into the diff (not a subdiff)
-	// 如果 diffLevel 为 0
 	if (!diffLevel++) {
 		// when first starting the diff, check if we're diffing an SVG or within an SVG
-		// 是否在 svg 中
+		// 判断是否在 svg 中
 		isSvgMode = parent instanceof SVGElement;
 
 		// hydration is inidicated by the existing element to be diffed not having a prop cache
+		// 表示是简单节点，不是混合组件
 		hydrating = dom && !(ATTR_KEY in dom);
 	}
 
@@ -63,15 +70,16 @@ export function diff(dom, vnode, context, mountAll, parent, componentRoot) {
 	// append the element if its a new parent
 	if (parent && ret.parentNode!==parent) {
 		parent.appendChild(ret);
-		// qreact begin
-		loseup(vnode, ret)
-		// qreact end
+		// m-start
+		loseup(vnode, ret);
+		// m-end
 	}
 
 	// diffLevel being reduced to 0 means we're exiting the diff
 	if (!--diffLevel) {
 		hydrating = false;
 		// invoke queued componentDidMount lifecycle methods
+		// 调用组价的 DidMount 生命周期方法
 		if (!componentRoot) flushMounts();
 	}
 
@@ -85,7 +93,7 @@ function idiff(dom, vnode, context, mountAll) {
 
 	// Resolve ephemeral Pure Functional Components
 	// 如果 vnode 是一个函数就执行函数得到结果，函数返回的可能还是一个纯函数组件
-	// 这里需要不断执行，知道结果不是函数
+	// 这里需要不断执行，直到结果不是函数
 	while (isFunctionalComponent(vnode)) {
 		vnode = buildFunctionalComponent(vnode, context);
 	}
@@ -140,27 +148,32 @@ function idiff(dom, vnode, context, mountAll) {
 		// - create an element with the nodeName from VNode
 		// 调用 createElement(NS) 来创建 DOM 节点
 		out = createNode(nodeName, isSvgMode);
-		// qreact begin
-		vnode && loseup(vnode, out)
-		// qreact end
+		// m-start
+		vnode && loseup(vnode, out);
+		// m_end
 	}
+	// 如果 DOM 节点的类型和虚拟 Node 不符
 	else if (!isNamedNode(dom, nodeName)) {
 		// case: Element and VNode had different nodeNames
 		// - need to create the correct Element to match VNode
 		// - then migrate children from old to new
 
+		// 调用 createElement(NS) 来创建 DOM 节点
 		out = createNode(nodeName, isSvgMode);
-		// qreact begin
-		vnode && loseup(vnode, out)
-		// qreact end
+		// m-start
+		vnode && loseup(vnode, out);
+		// m_end
 
 		// move children into the replacement node
+		// 将子节点全部移入到新的节点中去
 		while (dom.firstChild) out.appendChild(dom.firstChild);
 
 		// if the previous Element was mounted into the DOM, replace it inline
+		// 替换节点
 		if (dom.parentNode) dom.parentNode.replaceChild(out, dom);
 
 		// recycle the old element (skips non-Element node types)
+		// 回收原节点
 		recollectNodeTree(dom);
 	}
 
@@ -176,10 +189,8 @@ function idiff(dom, vnode, context, mountAll) {
 	}
 
 
-	// Apply attributes/props from VNode to the DOM Element:
-	diffAttributes(out, vnode.attributes, props, vnode);
-	
 	// Optimization: fast-path for elements containing a single TextNode:
+	// 以字符串为内容的节点
 	if (!hydrating && vchildren && vchildren.length===1 && typeof vchildren[0]==='string' && fc && fc instanceof Text && !fc.nextSibling) {
 		if (fc.nodeValue!=vchildren[0]) {
 			fc.nodeValue = vchildren[0];
@@ -187,11 +198,27 @@ function idiff(dom, vnode, context, mountAll) {
 	}
 	// otherwise, if there are existing or new children, diff them:
 	else if (vchildren && vchildren.length || fc) {
+		// 对子节点进行 diff
+		// 一个深度优先的遍历
 		innerDiffNode(out, vchildren, context, mountAll, !!props.dangerouslySetInnerHTML);
 	}
 
 
+	// Apply attributes/props from VNode to the DOM Element:
+	// 对属性进行 diff
+	diffAttributes(out, vnode.attributes, props, vnode);
+
+
 	// invoke original ref (from before resolving Pure Functional Components):
+
+	/**
+	 * 如果原来的 ref 是一个函数，就在新的节点上调用 ref
+	 * <div
+	 * 	ref={(ref) => this.div = ref}
+	 * >
+	 * </div>
+	 * 可见这里 ref 就已经是 dom 节点了
+	 */
 	if (originalAttributes && typeof originalAttributes.ref==='function') {
 		(props.ref = originalAttributes.ref)(out);
 	}
@@ -221,7 +248,7 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
 		vlen = vchildren && vchildren.length,
 		j, c, vchild, child;
 
-	// 如果有子节点
+	// 如果有子 dom 节点
 	if (len) {
 		for (let i=0; i<len; i++) {
 			let child = originalChildren[i],
@@ -239,7 +266,7 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
 		}
 	}
 
-	// 如果有 vnode
+	// 如果有 vnode children
 	if (vlen) {
 		for (let i=0; i<vlen; i++) {
 			vchild = vchildren[i];
@@ -299,12 +326,14 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
 					// }
 					if (dom === child.parentNode) {
 	                	var originalChild = originalChildren[i],
-	                		nextChild = originalChild.nextSibling
+	                		nextChild = originalChild && originalChild.nextSibling
 	                	while(nextChild) {
-	                		if (nextChild === child) break
-	                		if (originalChild[ATTR_KEY].key !== null) {
+	                		if (key in originalChild[ATTR_KEY]) {
 	                			recollectNodeTree(originalChild)
+	                		} else {
+	                			break
 	                		}
+	                		if (nextChild === child) break
 	                		originalChild = nextChild
 	                		nextChild = originalChild.nextSibling
 	                	}
@@ -347,6 +376,7 @@ export function recollectNodeTree(node, unmountOnly) {
 	else {
 		// If the node's VNode had a ref function, invoke it with null here.
 		// (this is part of the React spec, and smart for unsetting references)
+		// 置空 ref 函数
 		if (node[ATTR_KEY] && node[ATTR_KEY].ref) node[ATTR_KEY].ref(null);
 
 		if (!unmountOnly) {

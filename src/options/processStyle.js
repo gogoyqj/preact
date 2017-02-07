@@ -3,7 +3,7 @@ import { isString } from '../util';
 
 // m-start
 // 设置style
-function style(node,name,old,value){
+function processStyle(node,name,old,value){
 	// value是string的，直接赋值 ？ react是怎么处理的？
 	if (!value || isString(value) || isString(old)) {
 		node.style.cssText = value || '';
@@ -52,4 +52,4 @@ function transStyleValue(name,value){
 // m-end
 
 
-export default style;
+export default processStyle;
