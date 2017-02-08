@@ -341,7 +341,6 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
 		child = children[childrenLen--];
 		if (child) recollectNodeTree(child);
 	}
-	document.body.scrollTop
 }
 
 
