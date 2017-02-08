@@ -321,22 +321,8 @@ function innerDiffNode(dom, vchildren, context, mountAll, absorb) {
 				// diff 出来的 DOM 和原来不同
 				else if (child!==originalChildren[i]) {
 					// 如果和原来位置的后一个相同，说明需要移除原位置的 DOM 节点
-					// if (child===originalChildren[i+1]) {
-					// 	removeNode(originalChildren[i]);
-					// }
-					if (dom === child.parentNode) {
-	                	var originalChild = originalChildren[i],
-	                		nextChild = originalChild && originalChild.nextSibling
-	                	while(nextChild) {
-	                		if (key in originalChild[ATTR_KEY]) {
-	                			recollectNodeTree(originalChild)
-	                		} else {
-	                			break
-	                		}
-	                		if (nextChild === child) break
-	                		originalChild = nextChild
-	                		nextChild = originalChild.nextSibling
-	                	}
+					if (child===originalChildren[i+1]) {
+						removeNode(originalChildren[i]);
 					} else {
 						dom.insertBefore(child, originalChildren[i] || null);
 					}
